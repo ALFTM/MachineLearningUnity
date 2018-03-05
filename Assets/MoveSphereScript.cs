@@ -6,15 +6,22 @@ using System.Runtime.InteropServices;
 public class MoveSphereScript : MonoBehaviour {
 
     [SerializeField]
-    private Transform[] sphereTransform;
+	private GameObject preFabSphere;
 
 	// Use this for initialization
 	void Start () {
+		Debug.Log("GlaDOS Init");
+		for(int z = 0; z < 10; z++){
+			for(int x = 0; x < 10; x++){
+				Instantiate (preFabSphere, new Vector3 (x, 0, z), Quaternion.identity);
+			}
+		}
+
+		Instantiate (preFabSphere, new Vector3 (3, -2, 4), Quaternion.identity);
+		Instantiate (preFabSphere, new Vector3 (1, 2, 2), Quaternion.identity);
+		Instantiate (preFabSphere, new Vector3 (6, 2, 5), Quaternion.identity);
         Debug.Log("GlaDOS Start");
         Debug.Log(glaDOS());
-        sphereTransform[0].position += Vector3.down * 2f;
-        sphereTransform[1].position += Vector3.up * 2f;
-        sphereTransform[2].position += Vector3.forward * 2f;
     }
 	
 	// Update is called once per frame
