@@ -96,7 +96,7 @@ public class SeparableLinear3Exemple : MonoBehaviour {
 
     private System.IntPtr CreateModel(int height, int width)
     {
-        return perceptronLinearInit(height, width);
+        return perceptronLinearInit(width);
     }
 
     private System.IntPtr TrainClassif(System.IntPtr model, double[] inputs, double[] outputs, int height, int width)
@@ -115,7 +115,7 @@ public class SeparableLinear3Exemple : MonoBehaviour {
     }
 
     [DllImport("GlaDOS")]
-    private static extern System.IntPtr perceptronLinearInit(int height, int width);
+    private static extern System.IntPtr perceptronLinearInit(int width);
     [DllImport("GlaDOS")]
     private static extern System.IntPtr perceptronLinearTraining(System.IntPtr model, double[] inputs, double[] outputs, int height, int width);
     [DllImport("GlaDOS")]
