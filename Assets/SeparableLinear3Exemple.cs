@@ -16,13 +16,24 @@ public class SeparableLinear3Exemple : MonoBehaviour {
     // Use this for initialization
     void Start () {
 
-        _model = CreateModel(9, 3);
+        _model = CreateModel(6, 2);
 
-        var outputs = new int[] { -1, -1, 1 };
+        var allOutputsPosition = new double[] { -1, -1, 1};
 
         var allInputsPosition = GetPositionOfSpheres(trainingSpheres);
 
-        _model = TrainClassif(_model, allInputsPosition, outputs, 3, 3);
+        _model = TrainClassif(_model, allInputsPosition, allOutputsPosition, 3, 2);
+
+        //foreach (var elt in allInputsPosition)
+        //{
+        //    Debug.Log(elt);
+        //}
+        //Debug.Log("");
+
+        //foreach (var elt in allOutputsPosition)
+        //{
+        //    Debug.Log(elt);
+        //}
 
         var testSpheres = new List<GameObject>();
 
@@ -37,16 +48,28 @@ public class SeparableLinear3Exemple : MonoBehaviour {
         for (var i = 0; i < testSpheres.Count; i++)
         {
             var allPosition = GetPositionOfSphere(testSpheres[i]);
-            testSpheres[i].transform.position += Vector3.up * perceptronLinearClassify(_model, allPosition, 3);
+            testSpheres[i].transform.position += Vector3.up * perceptronLinearClassify(_model, allPosition, 2);
         }
 
-        freePtr(_model);
+        DeleteModel(_model);
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		
 	}
+
+    private double[] GetPositionOfSpheresOuput(IEnumerable<GameObject> gameObject)
+    {
+        List<double> list = new List<double>();
+
+        foreach (var sphere in gameObject)
+        {
+            list.Add(sphere.transform.position.y);
+        }
+
+        return list.ToArray();
+    }
 
     private double[] GetPositionOfSpheres(IEnumerable<GameObject> gameObject)
     {
@@ -65,7 +88,6 @@ public class SeparableLinear3Exemple : MonoBehaviour {
         List<double> list = new List<double>
         {
             gameObject.transform.position.x,
-            gameObject.transform.position.y,
             gameObject.transform.position.z
         };
 
@@ -77,7 +99,7 @@ public class SeparableLinear3Exemple : MonoBehaviour {
         return perceptronLinearInit(height, width);
     }
 
-    private System.IntPtr TrainClassif(System.IntPtr model, double[] inputs, int[] outputs, int height, int width)
+    private System.IntPtr TrainClassif(System.IntPtr model, double[] inputs, double[] outputs, int height, int width)
     {
         return perceptronLinearTraining(model, inputs, outputs, height, width);
     }
@@ -95,7 +117,7 @@ public class SeparableLinear3Exemple : MonoBehaviour {
     [DllImport("GlaDOS")]
     private static extern System.IntPtr perceptronLinearInit(int height, int width);
     [DllImport("GlaDOS")]
-    private static extern System.IntPtr perceptronLinearTraining(System.IntPtr model, double[] inputs, int[] outputs, int height, int width);
+    private static extern System.IntPtr perceptronLinearTraining(System.IntPtr model, double[] inputs, double[] outputs, int height, int width);
     [DllImport("GlaDOS")]
     private static extern int perceptronLinearClassify(System.IntPtr model, double[] inputs, int width);
     [DllImport("GlaDOS")]
