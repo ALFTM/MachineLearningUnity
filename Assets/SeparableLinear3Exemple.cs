@@ -16,24 +16,13 @@ public class SeparableLinear3Exemple : MonoBehaviour {
     // Use this for initialization
     void Start () {
 
-        _model = CreateModel(6, 2);
+        _model = CreateModel(2);
 
-        var allOutputsPosition = new double[] { -1, -1, 1};
+        var allOutputsPosition = GetPositionOfSpheresOuput(trainingSpheres);
 
         var allInputsPosition = GetPositionOfSpheres(trainingSpheres);
 
-        _model = TrainClassif(_model, allInputsPosition, allOutputsPosition, 3, 2);
-
-        //foreach (var elt in allInputsPosition)
-        //{
-        //    Debug.Log(elt);
-        //}
-        //Debug.Log("");
-
-        //foreach (var elt in allOutputsPosition)
-        //{
-        //    Debug.Log(elt);
-        //}
+        _model = TrainClassif(_model, allInputsPosition, allOutputsPosition, trainingSpheres.Length, 2);
 
         var testSpheres = new List<GameObject>();
 
@@ -48,7 +37,16 @@ public class SeparableLinear3Exemple : MonoBehaviour {
         for (var i = 0; i < testSpheres.Count; i++)
         {
             var allPosition = GetPositionOfSphere(testSpheres[i]);
-            testSpheres[i].transform.position += Vector3.up * perceptronLinearClassify(_model, allPosition, 2);
+            int Y = perceptronLinearClassify(_model, allPosition, 2);
+            testSpheres[i].transform.position += Vector3.up * Y;
+
+            if (Y > 0) {
+                AddColorToSphere(testSpheres[i], Color.red);
+            }
+            else
+            {
+                AddColorToSphere(testSpheres[i], Color.blue);
+            }
         }
 
         DeleteModel(_model);
@@ -58,6 +56,11 @@ public class SeparableLinear3Exemple : MonoBehaviour {
 	void Update () {
 		
 	}
+
+    private void AddColorToSphere(GameObject gameObject, Color color)
+    {
+        gameObject.transform.GetComponent<Renderer>().material.color = color;
+    }
 
     private double[] GetPositionOfSpheresOuput(IEnumerable<GameObject> gameObject)
     {
@@ -94,7 +97,7 @@ public class SeparableLinear3Exemple : MonoBehaviour {
         return list.ToArray();
     }
 
-    private System.IntPtr CreateModel(int height, int width)
+    private System.IntPtr CreateModel(int width)
     {
         return perceptronLinearInit(width);
     }
