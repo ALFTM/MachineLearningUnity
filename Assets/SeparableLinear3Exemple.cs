@@ -18,7 +18,7 @@ public class SeparableLinear3Exemple : MonoBehaviour {
 
         _model = CreateModel(9, 3);
 
-        var outputs = new int[] { -1, 1, -1 };
+        var outputs = new int[] { -1, -1, 1 };
 
         var allInputsPosition = GetPositionOfSpheres(trainingSpheres);
 
@@ -39,6 +39,8 @@ public class SeparableLinear3Exemple : MonoBehaviour {
             var allPosition = GetPositionOfSphere(testSpheres[i]);
             testSpheres[i].transform.position += Vector3.up * perceptronLinearClassify(_model, allPosition, 3);
         }
+
+        freePtr(_model);
 	}
 	
 	// Update is called once per frame
