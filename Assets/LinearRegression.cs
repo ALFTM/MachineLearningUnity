@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Runtime.InteropServices;
 using System.Linq;
+using System;
 
 public class LinearRegression : MonoBehaviour {
 
@@ -12,16 +13,18 @@ public class LinearRegression : MonoBehaviour {
     [SerializeField]
     GameObject[] trainingSpheres;
 
-    private System.IntPtr _equation;
+    private System.IntPtr _model;
 
     // Use this for initialization
     void Start () {
 
-        var inputsX = GetAllPositionOfAxeX(trainingSpheres);
-        var inputsZ = GetAllPositionOfAxeZ(trainingSpheres);
+        var inputs = GetAllPosition(trainingSpheres);
+        var outputs = GetAllPositionY(trainingSpheres);
+        int width = 2;
 
+        _model = perceptronLinearRegressionCreate(width);
 
-        _equation = perceptronLinearRegressionTrain(inputsX, inputsZ, trainingSpheres.Length);
+        perceptronLinearRegressionTrain(_model, inputs, width, inputs.Length, outputs, outputs.Length);
 
         var testSpheres = new List<GameObject>();
 
@@ -35,8 +38,12 @@ public class LinearRegression : MonoBehaviour {
 
         for (var i = 0; i < testSpheres.Count; i++)
         {
-            int Y = perceptronLinearRegressionPredict(_equation, testSpheres[i].transform.position.x, testSpheres[i].transform.position.z);
-            testSpheres[i].transform.position += Vector3.up * Y;
+            double[] inputsTestSpheres = new double[] {
+                testSpheres[i].transform.position.x,
+                testSpheres[i].transform.position.z
+            };
+            float Y = (float)perceptronLinearRegressionPredict(_model, inputsTestSpheres);
+            testSpheres[i].transform.position += new Vector3(0, Y, 0);
 
             if (Y > 0)
             {
@@ -47,6 +54,8 @@ public class LinearRegression : MonoBehaviour {
                 AddColorToSphere(testSpheres[i], Color.blue);
             }
         }
+
+        freePtr(_model);
     }
 	
 	// Update is called once per frame
@@ -59,32 +68,37 @@ public class LinearRegression : MonoBehaviour {
         gameObject.transform.GetComponent<Renderer>().material.color = color;
     }
 
-    private double[] GetAllPositionOfAxeX(GameObject[] gameObject)
+    private double[] GetAllPosition(GameObject[] gameObject)
     {
         var positions = new List<double>();
 
         for(int i = 0; i < gameObject.Length; i++)
         {
             positions.Add(gameObject[i].transform.position.x);
-        }
-
-        return positions.ToArray();
-    }
-
-    private double[] GetAllPositionOfAxeZ(GameObject[] gameObject)
-    {
-        var positions = new List<double>();
-
-        for (int i = 0; i < gameObject.Length; i++)
-        {
             positions.Add(gameObject[i].transform.position.z);
         }
 
         return positions.ToArray();
     }
 
+    private double[] GetAllPositionY(GameObject[] gameObject)
+    {
+        var positions = new List<double>();
+
+        for (int i = 0; i < gameObject.Length; i++)
+        {
+            positions.Add(gameObject[i].transform.position.y);
+        }
+
+        return positions.ToArray();
+    }
+
     [DllImport("GlaDOS")]
-    private static extern System.IntPtr perceptronLinearRegressionTrain(double[] inputsX, double[] inputsY, int sizeInputs);
+    private static extern System.IntPtr perceptronLinearRegressionCreate(int width);
     [DllImport("GlaDOS")]
-    private static extern int perceptronLinearRegressionPredict(System.IntPtr equation, double x, double y);
+    private static extern void perceptronLinearRegressionTrain(System.IntPtr weights, double[] inputs, int width, int inputsLength, double[] outputs, int outputsLength);
+    [DllImport("GlaDOS")]
+    private static extern double perceptronLinearRegressionPredict(System.IntPtr weights, double[] inputs);
+    [DllImport("GlaDOS")]
+    private static extern void freePtr(System.IntPtr model);
 }
