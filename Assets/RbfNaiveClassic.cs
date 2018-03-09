@@ -20,18 +20,69 @@ public class RbfNaiveClassic : MonoBehaviour {
         var outputs = GetAllPositionY(trainingSpheres);
 
         Debug.Log("Start Create");
+        Debug.Log("TRAINING SPHERE LENGHT : ");
+        Debug.Log(trainingSpheres.Length);
         _model = rbfNaiveClassicCreate(trainingSpheres.Length);
 
-        Debug.Log("Start Training");
-        rbfNaiveClassicTraining(_model, inputs, outputs, inputs.Length, 2, 0.1);
+        double[] array = new double[trainingSpheres.Length];
+        Marshal.Copy(_model, array, 0, trainingSpheres.Length);
 
-        double[] array = new double[inputs.Length];
-        Marshal.Copy(_model, array, 0, inputs.Length);
-
+        
         foreach (var item in array)
         {
             Debug.Log(item);
         }
+        
+        //unsafe {
+
+        //    double* poids = (double*)_model.ToPointer();
+
+
+        //    for (int t = 0; t < trainingSpheres.Length; t++) {
+        //        double value = poids[t];
+
+        //        Debug.Log(value);
+        //    }
+        //}
+
+
+
+        Debug.Log("Start Training");
+        rbfNaiveClassicTraining(_model, inputs, outputs, inputs.Length, 2, 0.1);
+
+        Debug.Log("Training FInish");
+
+        array = new double[trainingSpheres.Length];
+        Marshal.Copy(_model, array, 0, trainingSpheres.Length);
+
+
+        foreach (var item in array) {
+            Debug.Log(item);
+        }
+
+        //unsafe {
+
+        //    double* poids = (double*)_model.ToPointer();
+
+
+        //    for (int t = 0; t < trainingSpheres.Length; t++) {
+        //        double value = poids[t];
+
+        //        Debug.Log(value);
+        //    }
+        //}
+
+        Debug.Log("After unsafe");
+
+         array = new double[trainingSpheres.Length];
+        Marshal.Copy(_model, array, 0, trainingSpheres.Length);
+
+        /*
+        foreach (var item in array)
+        {
+            Debug.Log(item);
+        }
+        */
 
         var testSpheres = new List<GameObject>();
 
@@ -49,7 +100,7 @@ public class RbfNaiveClassic : MonoBehaviour {
             double[] testInput = new double[2]
             {
                 testSpheres[i].transform.position.x,
-                testSpheres[i].transform.position.y
+                testSpheres[i].transform.position.z
             };
 
             float Y = (float) rbfNaiveClassicClassify(_model, inputs, testInput, inputs.Length, 2, 0.1);
@@ -110,6 +161,8 @@ public class RbfNaiveClassic : MonoBehaviour {
     private static extern void rbfNaiveClassicTraining(System.IntPtr weights, double[] inputs, double[] outputs, int nbSamples, int width, double gamma);
     [DllImport("GlaDOS")]
     private static extern double rbfNaiveClassicClassify(System.IntPtr weights, double[] inputs, double[] testInput, int nbSamples, int width, double gamma);
+    [DllImport("GlaDOS")]
+    private static extern double rbfNaiveClassic(System.IntPtr weights, double[] inputs, double[] testInput, int nbSamples, int width, double gamma);
     [DllImport("GlaDOS")]
     private static extern void freePtr(System.IntPtr model);
 }
