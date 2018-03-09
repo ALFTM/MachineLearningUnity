@@ -19,70 +19,9 @@ public class RbfNaiveClassic : MonoBehaviour {
         var inputs = GetAllPosition(trainingSpheres);
         var outputs = GetAllPositionY(trainingSpheres);
 
-        Debug.Log("Start Create");
-        Debug.Log("TRAINING SPHERE LENGHT : ");
-        Debug.Log(trainingSpheres.Length);
         _model = rbfNaiveClassicCreate(trainingSpheres.Length);
 
-        double[] array = new double[trainingSpheres.Length];
-        Marshal.Copy(_model, array, 0, trainingSpheres.Length);
-
-        
-        foreach (var item in array)
-        {
-            Debug.Log(item);
-        }
-        
-        //unsafe {
-
-        //    double* poids = (double*)_model.ToPointer();
-
-
-        //    for (int t = 0; t < trainingSpheres.Length; t++) {
-        //        double value = poids[t];
-
-        //        Debug.Log(value);
-        //    }
-        //}
-
-
-
-        Debug.Log("Start Training");
         rbfNaiveClassicTraining(_model, inputs, outputs, inputs.Length, 2, 0.1);
-
-        Debug.Log("Training FInish");
-
-        array = new double[trainingSpheres.Length];
-        Marshal.Copy(_model, array, 0, trainingSpheres.Length);
-
-
-        foreach (var item in array) {
-            Debug.Log(item);
-        }
-
-        //unsafe {
-
-        //    double* poids = (double*)_model.ToPointer();
-
-
-        //    for (int t = 0; t < trainingSpheres.Length; t++) {
-        //        double value = poids[t];
-
-        //        Debug.Log(value);
-        //    }
-        //}
-
-        Debug.Log("After unsafe");
-
-         array = new double[trainingSpheres.Length];
-        Marshal.Copy(_model, array, 0, trainingSpheres.Length);
-
-        /*
-        foreach (var item in array)
-        {
-            Debug.Log(item);
-        }
-        */
 
         var testSpheres = new List<GameObject>();
 
@@ -93,8 +32,7 @@ public class RbfNaiveClassic : MonoBehaviour {
                 testSpheres.Add(Instantiate(prefab, new Vector3(i - 5f, 0, j - 5f), Quaternion.identity));
             }
         }
-
-        Debug.Log("Start Classify");
+        
         for (var i = 0; i < testSpheres.Count; i++)
         {
             double[] testInput = new double[2]

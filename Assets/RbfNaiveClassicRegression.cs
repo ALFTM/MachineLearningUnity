@@ -18,10 +18,11 @@ public class RbfNaiveClassicRegression : MonoBehaviour {
 
         var inputs = GetAllPosition(trainingSpheres);
         var outputs = GetAllPositionY(trainingSpheres);
+        var gamma = 0.1;
 
         _model = rbfNaiveClassicCreate(trainingSpheres.Length);
 
-        rbfNaiveClassicTraining(_model, inputs, outputs, inputs.Length, 2, 0.1);
+        rbfNaiveClassicTraining(_model, inputs, outputs, inputs.Length, 2, gamma);
         
         var testSpheres = new List<GameObject>();
 
@@ -41,7 +42,7 @@ public class RbfNaiveClassicRegression : MonoBehaviour {
                 testSpheres[i].transform.position.z
             };
 
-            float Y = (float)rbfNaiveClassicPredict(_model, inputs, testInput, inputs.Length, 2, 0.1);
+            float Y = (float)rbfNaiveClassicPredict(_model, inputs, testInput, inputs.Length, 2, gamma);
 
             testSpheres[i].transform.position += new Vector3(0, Y, 0);
         }
